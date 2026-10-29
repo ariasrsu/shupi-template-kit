@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>树皮图文模板工具</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app">
+    <aside class="editor">
+      <div class="brand"><span class="brand-dot"></span><div><strong>树皮图文模板</strong><small>本地排版 · 1080 × 1440</small></div></div>
+      <div class="toolbar">
+        <button id="saveProject" type="button">保存项目 JSON</button>
+        <label class="button" for="importProject">导入项目 JSON</label><input id="importProject" type="file" accept="application/json,.json" hidden>
+      </div>
+      <section class="panel">
+        <h2>账号信息</h2>
+        <label>昵称<input id="authorName" type="text" maxlength="40"></label>
+        <label>@ 名字<input id="authorHandle" type="text" maxlength="40"></label>
+        <label class="checkbox"><input id="showBadge" type="checkbox"> 显示蓝色认证标识</label>
+        <label class="button upload" for="avatarUpload">上传头像</label><input id="avatarUpload" type="file" accept="image/*" hidden>
+      </section>
+      <section class="panel">
+        <div class="panel-head"><h2>页面</h2><button id="addPage" type="button">＋ 新增一页</button></div>
+        <div id="pageTabs" class="page-tabs"></div>
+        <div class="page-actions"><button id="moveLeft" type="button">← 前移</button><button id="moveRight" type="button">后移 →</button><button id="deletePage" type="button">删除本页</button></div>
+        <label>标题<input id="pageTitle" type="text" maxlength="60"></label>
+        <label>正文 <small>回车分行；==文字== 高亮，**文字** 黑色粗体；[[中间图片]] 插入第二张图</small><textarea id="pageBody" rows="8"></textarea></label>
+        <label class="color-field">高亮颜色 <span class="color-control"><input id="highlightColor" type="color" value="#fce1ed" aria-label="选择本页高亮颜色"><output id="highlightHex" for="highlightColor">#FCE1ED</output></span></label>
+        <label>下方素材形式<select id="visualType"><option value="steps">步骤示意</option><option value="tool">工具界面示意</option><option value="skill">Skill 流程示意</option><option value="image">上传图片</option><option value="none">不放素材</option></select></label>
+        <label id="stepsEditorLabel">步骤卡片 <small>每行「标题｜说明」，最多三行</small><textarea id="stepsEditor" rows="3"></textarea></label>
+        <div id="middleImageControls"><label class="button upload" for="middleImageUpload">上传正文中间图片</label><input id="middleImageUpload" type="file" accept="image/*" hidden><label>中间图片显示方式<select id="middleImageFit"><option value="cover-top">放大铺满（从顶部裁切）</option><option value="cover-center">放大铺满（居中裁切）</option><option value="contain">完整显示</option></select></label><p id="middleImageName" class="hint"></p></div>
+        <label id="imageUploadLabel" class="button upload" for="pageImage">上传本页图片</label><input id="pageImage" type="file" accept="image/*" hidden>
+        <label id="imageFitLabel">图片显示方式<select id="imageFit"><option value="cover-top">放大铺满（从顶部裁切）</option><option value="cover-center">放大铺满（居中裁切）</option><option value="contain">完整显示</option></select></label>
+        <p id="imageName" class="hint"></p>
+      </section>
+      <div class="export-actions"><button id="downloadOne" class="primary" type="button">下载当前 PNG</button><button id="downloadAll" type="button">下载全部 ZIP</button></div>
+      <p id="status" role="status" class="status"></p>
+    </aside>
+    <main class="preview-area"><div class="preview-head"><div><strong>实时预览</strong><span id="pageCount"></span></div><span>高亮颜色可选 · 本地生成</span></div><canvas id="preview" width="1080" height="1440" aria-label="当前图文页面预览"></canvas></main>
+  </div>
+  <script src="app.js"></script>
+</body>
+</html>

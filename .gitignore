@@ -1,0 +1,11 @@
+.render-*.html
+.DS_Store
+assets/avatar.jpg
+assets/comics/
+assets/screenshots/
+posts/
+private/
+output/
+shupi-project*.json
+shupi-page-*.png
+shupi-pages.zip
