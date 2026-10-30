@@ -133,11 +133,14 @@ async function drawUploaded(context,page,y,h) {
 }
 async function renderPage(page, target) {
   const c=target.getContext('2d'); await drawHeader(c);
-  let titleSize=68, titleLines=plainLines(c,page.title||'',976,titleSize,800);
-  while(titleLines.length>2 && titleSize>48){titleSize-=2;titleLines=plainLines(c,page.title||'',976,titleSize,800);}
-  const titleLineHeight=titleSize+12, titleY=205;
-  c.fillStyle='#202733';setFont(c,titleSize,800);titleLines.forEach((line,i)=>c.fillText(line,52,titleY+i*titleLineHeight));
-  const bodyY=titleY+titleLines.length*titleLineHeight+32;
+  const cover=page===state.pages[0];
+  let titleSize=cover?68:46, titleWeight=cover?800:750;
+  let titleLines=plainLines(c,page.title||'',976,titleSize,titleWeight);
+  if(cover){while(titleLines.length>2 && titleSize>48){titleSize-=2;titleLines=plainLines(c,page.title||'',976,titleSize,titleWeight);}}
+  else titleLines=titleLines.slice(0,2);
+  const titleY=cover?205:233, titleLineHeight=cover?titleSize+12:65;
+  c.fillStyle='#202733';setFont(c,titleSize,titleWeight);titleLines.forEach((line,i)=>c.fillText(line,52,titleY+i*titleLineHeight));
+  const bodyY=cover?titleY+titleLines.length*titleLineHeight+32:(titleLines.length>1?414:343);
   const body=String(page.body||''), markerAt=body.indexOf(INLINE_IMAGE_MARKER);
   const visual=page.visual||'none';
   if(markerAt!==-1 && page.middleImage && visual==='image'){
