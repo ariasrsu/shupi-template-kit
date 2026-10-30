@@ -5,6 +5,7 @@ const ctx = canvas.getContext('2d');
 const FONT = '"PingFang SC", "Microsoft YaHei", sans-serif';
 const DEFAULT_HIGHLIGHT = '#fce1ed';
 const INLINE_IMAGE_MARKER = '[[中间图片]]';
+const CONTENT_BOTTOM = 1370;
 const highlightColor = page => /^#[0-9a-f]{6}$/i.test(page?.highlightColor || '') ? page.highlightColor : DEFAULT_HIGHLIGHT;
 const initialPages = [
   {title:'在这里填写标题',body:'第一行写清一个观点。\n==这里是高亮重点==，**这里是黑色粗体**。\n上传自己的图片，或选择下方的步骤示意。',highlightColor:'#fce1ed',visual:'steps'}
@@ -121,7 +122,7 @@ async function drawUploaded(context,page,y,h) {
   if(fit==='contain'){
     const ratio=Math.min(box.w/image.width,box.h/image.height);
     const w=image.width*ratio,hh=image.height*ratio;
-    context.drawImage(image,box.x+(box.w-w)/2,box.y+(box.h-hh)/2,w,hh);
+    context.drawImage(image,box.x+(box.w-w)/2,box.y,w,hh);
     return;
   }
   const targetRatio=box.w/box.h, sourceRatio=image.width/image.height;
@@ -132,15 +133,17 @@ async function drawUploaded(context,page,y,h) {
 }
 async function renderPage(page, target) {
   const c=target.getContext('2d'); await drawHeader(c);
-  const titleLines=plainLines(c,page.title||'',976,46,750).slice(0,2);
-  c.fillStyle='#202733';setFont(c,46,750);titleLines.forEach((line,i)=>c.fillText(line,52,233+i*65));
-  const bodyY=titleLines.length>1?414:343;
+  let titleSize=68, titleLines=plainLines(c,page.title||'',976,titleSize,800);
+  while(titleLines.length>2 && titleSize>48){titleSize-=2;titleLines=plainLines(c,page.title||'',976,titleSize,800);}
+  const titleLineHeight=titleSize+12, titleY=205;
+  c.fillStyle='#202733';setFont(c,titleSize,800);titleLines.forEach((line,i)=>c.fillText(line,52,titleY+i*titleLineHeight));
+  const bodyY=titleY+titleLines.length*titleLineHeight+32;
   const body=String(page.body||''), markerAt=body.indexOf(INLINE_IMAGE_MARKER);
   const visual=page.visual||'none';
   if(markerAt!==-1 && page.middleImage && visual==='image'){
     const before=richLines(c,body.slice(0,markerAt).trimEnd(),976);
     const after=richLines(c,body.slice(markerAt+INLINE_IMAGE_MARKER.length).trimStart(),976);
-    const gap=18, remaining=1320-bodyY-(before.length+after.length)*79-gap*3;
+    const gap=18, remaining=CONTENT_BOTTOM-bodyY-(before.length+after.length)*79-gap*3;
     if(remaining<360){
       const lines=richLines(c,body.replace(INLINE_IMAGE_MARKER,'').replace(/\n\s*\n/g,'\n'),976);
       lines.forEach((line,i)=>drawRichLine(c,line,52,bodyY+i*79,highlightColor(page)));
@@ -159,12 +162,12 @@ async function renderPage(page, target) {
   const visibleBody=markerAt===-1?body:body.replace(INLINE_IMAGE_MARKER,'').replace(/\n\s*\n/g,'\n');
   const lines=richLines(c,visibleBody,976);
   lines.forEach((line,i)=>drawRichLine(c,line,52,bodyY+i*79,highlightColor(page)));
-  const visualY=bodyY+lines.length*79+22, available=1320-visualY;
+  const visualY=bodyY+lines.length*79+18, available=CONTENT_BOTTOM-visualY;
   let overflow=false;
   if(visual!=='none'){
     if(available<310)overflow=true;
-    else{const h=Math.min(590,available);if(visual==='steps')drawSteps(c,visualY,h,page);if(visual==='tool')drawTool(c,visualY,h,page);if(visual==='skill')drawSkill(c,visualY,h);if(visual==='image')await drawUploaded(c,page,visualY,h);}
-  } else if(bodyY+lines.length*79>1300)overflow=true;
+    else{const h=visual==='image'?available:Math.min(590,available);if(visual==='steps')drawSteps(c,visualY,h,page);if(visual==='tool')drawTool(c,visualY,h,page);if(visual==='skill')drawSkill(c,visualY,h);if(visual==='image')await drawUploaded(c,page,visualY,h);}
+  } else if(bodyY+lines.length*79>CONTENT_BOTTOM)overflow=true;
   return overflow;
 }
 async function renderSelected() {
